@@ -1,0 +1,1057 @@
+<!-- FINANZAS PERSONAL - FULL (1 archivo) -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finanzas Personal</title>
+
+  <!-- Gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+      --brand:#111827; --brand2:#374151; --danger:#b91c1c; --ok:#065f46;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg),#fff); color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background:rgba(255,255,255,.78);
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1180px; margin:0 auto; padding:14px 16px;}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;}
+    .brand{display:flex; align-items:center; gap:10px; min-width:260px;}
+    .logo{
+      width:40px; height:40px; border-radius:16px;
+      background:var(--brand); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+    }
+    .title b{display:block; line-height:1.05}
+    .title small{display:block; color:var(--muted); margin-top:2px}
+    .btn{
+      border:0; background:var(--brand); color:#fff; padding:10px 12px;
+      border-radius:14px; cursor:pointer; font-weight:700;
+    }
+    .btn.secondary{background:var(--brand2)}
+    .btn.outline{background:#fff; color:var(--text); border:1px solid var(--border)}
+    .btn.danger{background:var(--danger)}
+    .grid{display:grid; grid-template-columns: 1fr; gap:12px; padding:16px;}
+    @media(min-width:980px){ .grid{grid-template-columns: 380px 1fr;} }
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow: 0 1px 0 rgba(0,0,0,.03);
+      overflow:hidden;
+    }
+    .card .hd{padding:14px 14px 0 14px;}
+    .card .hd h3{margin:0; font-size:16px}
+    .card .bd{padding:14px;}
+    .muted{color:var(--muted); font-size:12px}
+    label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px;}
+    input, select, textarea{
+      width:100%; padding:10px 12px; border-radius:14px;
+      border:1px solid var(--border); outline:none; background:#fff;
+    }
+    textarea{min-height:70px; resize:vertical}
+    .two{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    .three{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;}
+    .kpis{display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; padding:16px;}
+    @media(min-width:980px){ .kpis{grid-template-columns: repeat(4, 1fr);} }
+    .kpi{padding:12px; border:1px solid var(--border); border-radius:16px; background:#fff;}
+    .kpi .v{font-size:18px; font-weight:900; margin-top:4px}
+    .tabs{display:flex; gap:8px; flex-wrap:wrap;}
+    .tab{padding:8px 10px; border-radius:999px; border:1px solid var(--border); cursor:pointer; background:#fff; font-weight:800; font-size:12px;}
+    .tab.active{background:var(--brand); color:#fff; border-color:var(--brand);}
+    .list{display:grid; gap:8px;}
+    .item{
+      border:1px solid var(--border); border-radius:16px;
+      padding:10px 12px; background:#fff;
+      display:flex; gap:10px; justify-content:space-between; align-items:flex-start;
+    }
+    .item b{display:block}
+    .pill{display:inline-block; font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); color:var(--muted);}
+    .right{text-align:right}
+    .smallbtn{
+      padding:6px 10px; border-radius:12px; border:1px solid var(--border);
+      background:#fff; cursor:pointer; font-weight:800; font-size:12px;
+    }
+    .smallbtn.danger{border-color:#fecaca; color:#991b1b;}
+    .hr{height:1px; background:var(--border); margin:12px 0;}
+    .hidden{display:none !important}
+
+    /* Modal */
+    .modalbg{
+      position:fixed; inset:0; background:rgba(0,0,0,.35);
+      display:none; align-items:center; justify-content:center; padding:18px;
+      z-index:50;
+    }
+    .modal{max-width:620px; width:100%; background:#fff; border-radius:18px; border:1px solid var(--border); overflow:hidden;}
+    .modal .mh{padding:14px 14px 0 14px; display:flex; justify-content:space-between; align-items:center;}
+    .modal .mb{padding:14px;}
+    .modal .mf{padding:0 14px 14px 14px; display:flex; gap:10px; justify-content:flex-end;}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <div class="row">
+      <div class="brand">
+        <div class="logo">₡$</div>
+        <div class="title">
+          <b>Finanzas Personal</b>
+          <small id="subhead">Moneda base: CRC • Tasa: 520 CRC/USD</small>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:flex-end">
+        <select id="monthSelect" style="width:140px"></select>
+        <button class="btn outline" id="btnReportsCsv">Export CSV</button>
+        <button class="btn outline" id="btnBackup">Backup</button>
+        <button class="btn outline" id="btnRestore">Restaurar</button>
+        <button class="btn outline" id="btnSettings">Ajustes</button>
+        <button class="btn danger" id="btnLock">Bloquear</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="kpi"><div class="muted">Ingresos</div><div class="v" id="kpiIncome">—</div></div>
+    <div class="kpi"><div class="muted">Gastos</div><div class="v" id="kpiExpense">—</div></div>
+    <div class="kpi"><div class="muted">Inversiones</div><div class="v" id="kpiInvest">—</div></div>
+    <div class="kpi"><div class="muted">Neto</div><div class="v" id="kpiNet">—</div></div>
+  </div>
+</div>
+
+<div class="grid wrap">
+  <!-- Izquierda -->
+  <div class="card">
+    <div class="hd">
+      <h3>Nuevo movimiento</h3>
+      <div class="muted">Ingresos • Gastos • Inversiones • CRC/USD • categorías • tipo de pago</div>
+    </div>
+    <div class="bd">
+      <div class="two">
+        <div>
+          <label>Tipo</label>
+          <select id="txType">
+            <option value="gasto">Gasto</option>
+            <option value="ingreso">Ingreso</option>
+            <option value="inversion">Inversión</option>
+          </select>
+        </div>
+        <div>
+          <label>Fecha</label>
+          <input id="txDate" type="date"/>
+        </div>
+      </div>
+
+      <label>Descripción</label>
+      <input id="txDesc" placeholder="Ej: Super, gasolina, salario, compra de ETF..."/>
+
+      <div class="two">
+        <div>
+          <label>Categoría</label>
+          <select id="txCat"></select>
+          <div class="muted">Sugerencia automática por reglas (editable en Ajustes).</div>
+        </div>
+        <div class="two" style="gap:10px;">
+          <div>
+            <label>Monto</label>
+            <input id="txAmt" type="number" placeholder="0"/>
+          </div>
+          <div>
+            <label>Moneda</label>
+            <select id="txCur">
+              <option value="CRC">CRC (₡)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="two">
+        <div>
+          <label>Pago</label>
+          <select id="txPayType">
+            <option value="efectivo">Efectivo</option>
+            <option value="debito">Tarjeta débito</option>
+            <option value="credito">Tarjeta crédito</option>
+          </select>
+        </div>
+        <div>
+          <label>¿Cuál tarjeta?</label>
+          <select id="txPayInst"></select>
+        </div>
+      </div>
+
+      <label>Notas (opcional)</label>
+      <textarea id="txNotes" placeholder="Ej: reembolso, compra para la casa, etc."></textarea>
+
+      <div class="row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn" id="btnAddTx">Guardar</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <b>Gastos fijos mensuales</b>
+          <div class="muted">Plantillas (internet, alquiler, seguros...).</div>
+        </div>
+        <div class="row" style="justify-content:flex-end;">
+          <button class="btn secondary" id="btnNewFixed">Nuevo fijo</button>
+          <button class="btn outline" id="btnGenFixed">Generar mes</button>
+        </div>
+      </div>
+
+      <div class="list" id="fixedList" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- Derecha -->
+  <div class="card">
+    <div class="hd">
+      <div class="row">
+        <div>
+          <h3>Movimientos del mes</h3>
+          <div class="muted" id="txCount">—</div>
+        </div>
+        <div class="tabs">
+          <div class="tab active" data-tab="mov">Movimientos</div>
+          <div class="tab" data-tab="rep">Reportes</div>
+          <div class="tab" data-tab="rules">Reglas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bd">
+      <div id="tabMov">
+        <div class="list" id="txList"></div>
+      </div>
+
+      <div id="tabRep" class="hidden">
+        <div class="two">
+          <div class="card" style="border-radius:16px;">
+            <div class="bd">
+              <b>Gastos por categoría</b>
+              <div class="muted">Mes seleccionado • en moneda base</div>
+              <canvas id="chartCat" height="210"></canvas>
+            </div>
+          </div>
+          <div class="card" style="border-radius:16px;">
+            <div class="bd">
+              <b>Gastos por tipo de pago</b>
+              <div class="muted">Mes seleccionado • en moneda base</div>
+              <canvas id="chartPay" height="210"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="card" style="border-radius:16px;">
+          <div class="bd">
+            <b>Evolución (6 meses)</b>
+            <div class="muted">Ingresos / Gastos / Inversiones / Neto</div>
+            <canvas id="chartTrend" height="130"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div id="tabRules" class="hidden">
+        <b>Detección automática de categorías</b>
+        <div class="muted">Ejemplos: “uber=Transporte”, “walmart=Alimentación” (editar en Ajustes).</div>
+        <div class="hr"></div>
+        <div class="muted">Tip: escribe “super” o “walmart” en descripción y mira cómo se sugiere categoría.</div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="muted">
+        Seguridad: PIN básico (local). Huella real requiere PWA/WebAuthn (siguiente fase).
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LOCK/PIN -->
+<div class="modalbg" id="lockBg">
+  <div class="modal">
+    <div class="mh">
+      <b>Bloqueo (PIN)</b>
+      <button class="smallbtn" id="closeLock">X</button>
+    </div>
+    <div class="mb">
+      <div class="muted">Crea un PIN o desbloquea con PIN.</div>
+      <label>PIN</label>
+      <input id="pinInput" type="password" placeholder="Mínimo 4 dígitos"/>
+      <div id="pinConfirmWrap" class="hidden">
+        <label>Confirmar PIN</label>
+        <input id="pinConfirm" type="password" placeholder="Repite el PIN"/>
+      </div>
+      <div class="muted" id="pinMsg" style="margin-top:10px;"></div>
+    </div>
+    <div class="mf">
+      <button class="btn outline" id="btnPinMode">Crear PIN</button>
+      <button class="btn" id="btnPinOk">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SETTINGS -->
+<div class="modalbg" id="setBg">
+  <div class="modal">
+    <div class="mh">
+      <b>Ajustes</b>
+      <button class="smallbtn" id="closeSet">X</button>
+    </div>
+    <div class="mb">
+      <div class="three">
+        <div>
+          <label>Moneda base (reportes)</label>
+          <select id="setBaseCur">
+            <option value="CRC">CRC (₡)</option>
+            <option value="USD">USD ($)</option>
+          </select>
+        </div>
+        <div>
+          <label>Tasa (CRC por 1 USD)</label>
+          <input id="setFx" type="number" min="1" max="2000"/>
+        </div>
+        <div>
+          <label>Mes actual</label>
+          <div class="muted">Se cambia arriba</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <label>Categorías (separadas por ; )</label>
+      <input id="setCats"/>
+
+      <label>Tarjetas débito (coma)</label>
+      <input id="setDeb"/>
+
+      <label>Tarjetas crédito (coma)</label>
+      <input id="setCre"/>
+
+      <div class="hr"></div>
+
+      <label>Reglas de categoría (una por línea) — formato: palabra=categoría</label>
+      <textarea id="setRules"></textarea>
+      <div class="muted">Ej: walmart=Alimentación</div>
+    </div>
+    <div class="mf">
+      <button class="btn outline" id="btnSetReset">Restaurar defaults</button>
+      <button class="btn" id="btnSetSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: FIXED -->
+<div class="modalbg" id="fixBg">
+  <div class="modal">
+    <div class="mh">
+      <b id="fixTitle">Gasto fijo</b>
+      <button class="smallbtn" id="closeFix">X</button>
+    </div>
+    <div class="mb">
+      <input type="hidden" id="fixId"/>
+      <label>Nombre</label>
+      <input id="fixName" placeholder="Ej: Internet"/>
+
+      <label>Descripción</label>
+      <input id="fixDesc" placeholder="Ej: Kolbi internet hogar"/>
+
+      <div class="three">
+        <div>
+          <label>Monto</label>
+          <input id="fixAmt" type="number" placeholder="0"/>
+        </div>
+        <div>
+          <label>Moneda</label>
+          <select id="fixCur">
+            <option value="CRC">CRC</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+        <div>
+          <label>Día del mes (1–28)</label>
+          <input id="fixDay" type="number" min="1" max="28" value="1"/>
+        </div>
+      </div>
+
+      <div class="two">
+        <div>
+          <label>Categoría</label>
+          <select id="fixCat"></select>
+        </div>
+        <div class="two" style="gap:10px;">
+          <div>
+            <label>Pago</label>
+            <select id="fixPayType">
+              <option value="efectivo">Efectivo</option>
+              <option value="debito">Débito</option>
+              <option value="credito">Crédito</option>
+            </select>
+          </div>
+          <div>
+            <label>Tarjeta</label>
+            <select id="fixPayInst"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:flex-start; margin-top:10px;">
+        <input type="checkbox" id="fixEnabled" style="width:auto;"/>
+        <label for="fixEnabled" style="margin:0 0 0 8px; color:var(--text);">Activo</label>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn outline" id="btnFixCancel">Cancelar</button>
+      <button class="btn" id="btnFixSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========= ESTADO ========= */
+const LS="finanzas_full_v1";
+const defaultState=()=>({
+  auth:{ pinHash:"" },
+  settings:{
+    baseCurrency:"CRC",
+    fx:520,
+    categories:[
+      "Alimentación","Transporte","Vivienda","Servicios (agua/luz/internet)","Salud","Educación",
+      "Entretenimiento","Compras","Familia","Impuestos","Suscripciones","Ahorro","Inversión","Otros"
+    ],
+    cards:{ debito:["Débito principal"], credito:["Visa","Mastercard"] },
+    rules:[
+      {k:"uber",c:"Transporte"},{k:"didi",c:"Transporte"},{k:"gasolina",c:"Transporte"},
+      {k:"walmart",c:"Alimentación"},{k:"automercado",c:"Alimentación"},{k:"super",c:"Alimentación"},
+      {k:"farmacia",c:"Salud"},{k:"hospital",c:"Salud"},
+      {k:"netflix",c:"Suscripciones"},{k:"spotify",c:"Suscripciones"},
+      {k:"internet",c:"Servicios (agua/luz/internet)"},{k:"electricidad",c:"Servicios (agua/luz/internet)"},{k:"agua",c:"Servicios (agua/luz/internet)"},
+      {k:"alquiler",c:"Vivienda"},{k:"hipoteca",c:"Vivienda"},
+      {k:"etf",c:"Inversión"},{k:"acciones",c:"Inversión"},{k:"bitcoin",c:"Inversión"},
+    ]
+  },
+  data:{ tx:[], fixed:[] }
+});
+
+const load=()=>{
+  try{ const s=JSON.parse(localStorage.getItem(LS)||"null"); return (s&&s.settings)?s:defaultState(); }
+  catch{ return defaultState(); }
+};
+let STATE=load();
+const save=()=>localStorage.setItem(LS, JSON.stringify(STATE));
+
+const toNum=v=>{ const n=Number(String(v||"").replace(/,/g,"").trim()); return Number.isFinite(n)?n:0; };
+const yyyymm=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+
+const fmt=(amount,cur)=>{
+  const dec = cur==="CRC"?0:2;
+  try{ return new Intl.NumberFormat("es-CR",{style:"currency",currency:cur,maximumFractionDigits:dec}).format(amount); }
+  catch{ return cur+" "+Number(amount||0).toFixed(dec); }
+};
+
+const baseAmount=(tx)=>{
+  const {baseCurrency, fx}=STATE.settings;
+  if(tx.currency===baseCurrency) return tx.amount;
+  if(tx.currency==="USD" && baseCurrency==="CRC") return tx.amount*fx;
+  if(tx.currency==="CRC" && baseCurrency==="USD") return fx>0? tx.amount/fx : 0;
+  return tx.amount;
+};
+
+const detectCategory=(desc)=>{
+  const d=(desc||"").toLowerCase();
+  for(const r of (STATE.settings.rules||[])){
+    if(d.includes((r.k||"").toLowerCase())) return r.c || "Otros";
+  }
+  return "Otros";
+};
+
+const uid=()=>Date.now().toString(36)+Math.random().toString(16).slice(2);
+const escapeHtml=(s)=>String(s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+
+/* ========= PIN (BÁSICO) ========= */
+async function sha256(text){
+  const enc=new TextEncoder().encode(text);
+  const digest=await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+let pinModeCreate=false;
+
+const lockBg=document.getElementById("lockBg");
+const pinInput=document.getElementById("pinInput");
+const pinConfirmWrap=document.getElementById("pinConfirmWrap");
+const pinConfirm=document.getElementById("pinConfirm");
+const pinMsg=document.getElementById("pinMsg");
+const btnPinMode=document.getElementById("btnPinMode");
+const btnPinOk=document.getElementById("btnPinOk");
+
+function openLock(){
+  lockBg.style.display="flex";
+  pinInput.value=""; pinConfirm.value="";
+  pinModeCreate=!STATE.auth.pinHash;
+  pinConfirmWrap.classList.toggle("hidden", !pinModeCreate);
+  btnPinMode.textContent = pinModeCreate ? "Desbloquear" : "Crear PIN";
+  pinMsg.textContent = STATE.auth.pinHash ? "Ingresa tu PIN para desbloquear." : "Crea un PIN (mín. 4 dígitos).";
+}
+function closeLock(){ lockBg.style.display="none"; }
+
+document.getElementById("btnLock").addEventListener("click", openLock);
+document.getElementById("closeLock").addEventListener("click", closeLock);
+
+btnPinMode.addEventListener("click",()=>{
+  pinModeCreate=!pinModeCreate;
+  pinConfirmWrap.classList.toggle("hidden", !pinModeCreate);
+  btnPinMode.textContent = pinModeCreate ? "Desbloquear" : "Crear PIN";
+  pinMsg.textContent = pinModeCreate ? "Crea un PIN (mín. 4)." : "Ingresa tu PIN para desbloquear.";
+});
+
+btnPinOk.addEventListener("click", async ()=>{
+  const p=pinInput.value.trim();
+  if(pinModeCreate){
+    if(p.length<4){ pinMsg.textContent="PIN muy corto."; return; }
+    if(p!==pinConfirm.value.trim()){ pinMsg.textContent="Los PIN no coinciden."; return; }
+    STATE.auth.pinHash=await sha256(p); save();
+    pinMsg.textContent="PIN guardado. Desbloqueado.";
+    setTimeout(closeLock,400);
+  }else{
+    if(!STATE.auth.pinHash){ closeLock(); return; }
+    const h=await sha256(p);
+    if(h!==STATE.auth.pinHash){ pinMsg.textContent="PIN incorrecto."; return; }
+    pinMsg.textContent="Desbloqueado.";
+    setTimeout(closeLock,350);
+  }
+});
+
+/* ========= UI refs ========= */
+const monthSelect=document.getElementById("monthSelect");
+const txType=document.getElementById("txType");
+const txDate=document.getElementById("txDate");
+const txDesc=document.getElementById("txDesc");
+const txCat=document.getElementById("txCat");
+const txAmt=document.getElementById("txAmt");
+const txCur=document.getElementById("txCur");
+const txPayType=document.getElementById("txPayType");
+const txPayInst=document.getElementById("txPayInst");
+const txNotes=document.getElementById("txNotes");
+const btnAddTx=document.getElementById("btnAddTx");
+
+const txList=document.getElementById("txList");
+const txCount=document.getElementById("txCount");
+
+const fixedList=document.getElementById("fixedList");
+const btnNewFixed=document.getElementById("btnNewFixed");
+const btnGenFixed=document.getElementById("btnGenFixed");
+
+const subhead=document.getElementById("subhead");
+
+const kpiIncome=document.getElementById("kpiIncome");
+const kpiExpense=document.getElementById("kpiExpense");
+const kpiInvest=document.getElementById("kpiInvest");
+const kpiNet=document.getElementById("kpiNet");
+
+/* ========= Tabs ========= */
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const k=t.dataset.tab;
+    document.getElementById("tabMov").classList.toggle("hidden", k!=="mov");
+    document.getElementById("tabRep").classList.toggle("hidden", k!=="rep");
+    document.getElementById("tabRules").classList.toggle("hidden", k!=="rules");
+    render();
+  });
+});
+
+/* ========= Months ========= */
+const now=new Date();
+for(let i=0;i<12;i++){
+  const d=new Date(now.getFullYear(), now.getMonth()-i, 1);
+  const key=yyyymm(d);
+  const opt=document.createElement("option");
+  opt.value=key; opt.textContent=key;
+  monthSelect.appendChild(opt);
+}
+let ACTIVE_MONTH=yyyymm(new Date());
+monthSelect.value=ACTIVE_MONTH;
+monthSelect.addEventListener("change",()=>{ ACTIVE_MONTH=monthSelect.value; render(); });
+
+/* ========= helpers: cats/cards ========= */
+function fillCats(sel){
+  sel.innerHTML="";
+  for(const c of STATE.settings.categories){
+    const o=document.createElement("option");
+    o.value=c; o.textContent=c;
+    sel.appendChild(o);
+  }
+}
+function fillPayInst(sel, payType){
+  sel.innerHTML="";
+  const o0=document.createElement("option");
+  o0.value=""; o0.textContent="(Sin especificar)";
+  sel.appendChild(o0);
+  if(payType==="efectivo") return;
+  const arr = payType==="credito"? STATE.settings.cards.credito : STATE.settings.cards.debito;
+  for(const c of arr){
+    const o=document.createElement("option");
+    o.value=c; o.textContent=c;
+    sel.appendChild(o);
+  }
+}
+
+fillCats(txCat);
+fillPayInst(txPayInst, txPayType.value);
+
+txPayType.addEventListener("change",()=>fillPayInst(txPayInst, txPayType.value));
+
+txDate.value=new Date().toISOString().slice(0,10);
+
+txDesc.addEventListener("input",()=>{
+  const suggested=detectCategory(txDesc.value);
+  if(STATE.settings.categories.includes(suggested)) txCat.value=suggested;
+});
+
+/* ========= Add transaction ========= */
+btnAddTx.addEventListener("click",()=>{
+  const desc=txDesc.value.trim();
+  const amt=toNum(txAmt.value);
+  if(!desc || !amt) return;
+
+  const cat=txCat.value || detectCategory(desc);
+
+  const tx={
+    id:uid(),
+    date: txDate.value || new Date().toISOString().slice(0,10),
+    type: txType.value,
+    description: desc,
+    category: cat,
+    amount: amt,
+    currency: txCur.value,
+    paymentType: txPayType.value,
+    paymentInstrument: txPayInst.value || "",
+    notes: txNotes.value || ""
+  };
+
+  STATE.data.tx.unshift(tx);
+  save();
+
+  txDesc.value=""; txAmt.value=""; txNotes.value="";
+  txCat.value = detectCategory("");
+  render();
+});
+
+/* ========= Fixed modal ========= */
+const fixBg=document.getElementById("fixBg");
+const fixId=document.getElementById("fixId");
+const fixTitle=document.getElementById("fixTitle");
+const fixName=document.getElementById("fixName");
+const fixDesc=document.getElementById("fixDesc");
+const fixAmt=document.getElementById("fixAmt");
+const fixCur=document.getElementById("fixCur");
+const fixDay=document.getElementById("fixDay");
+const fixCat=document.getElementById("fixCat");
+const fixPayType=document.getElementById("fixPayType");
+const fixPayInst=document.getElementById("fixPayInst");
+const fixEnabled=document.getElementById("fixEnabled");
+const btnFixSave=document.getElementById("btnFixSave");
+const btnFixCancel=document.getElementById("btnFixCancel");
+
+document.getElementById("closeFix").addEventListener("click",()=>fixBg.style.display="none");
+btnFixCancel.addEventListener("click",()=>fixBg.style.display="none");
+
+fillCats(fixCat);
+fillPayInst(fixPayInst, fixPayType.value);
+fixPayType.addEventListener("change",()=>fillPayInst(fixPayInst, fixPayType.value));
+
+function openFixed(tpl=null){
+  fixBg.style.display="flex";
+  fillCats(fixCat);
+
+  if(!tpl){
+    fixTitle.textContent="Nuevo gasto fijo";
+    fixId.value="";
+    fixName.value="";
+    fixDesc.value="";
+    fixAmt.value="";
+    fixCur.value="CRC";
+    fixDay.value="1";
+    fixPayType.value="debito";
+    fillPayInst(fixPayInst, "debito");
+    fixPayInst.value = STATE.settings.cards.debito[0] || "";
+    fixCat.value="Otros";
+    fixEnabled.checked=true;
+  }else{
+    fixTitle.textContent="Editar gasto fijo";
+    fixId.value=tpl.id;
+    fixName.value=tpl.name||"";
+    fixDesc.value=tpl.description||"";
+    fixAmt.value=tpl.amount||0;
+    fixCur.value=tpl.currency||"CRC";
+    fixDay.value=tpl.day||1;
+    fixPayType.value=tpl.paymentType||"debito";
+    fillPayInst(fixPayInst, fixPayType.value);
+    fixPayInst.value=tpl.paymentInstrument||"";
+    fixCat.value=tpl.category||"Otros";
+    fixEnabled.checked=!!tpl.enabled;
+  }
+}
+btnNewFixed.addEventListener("click",()=>openFixed(null));
+
+btnFixSave.addEventListener("click",()=>{
+  const id = fixId.value || uid();
+  const name = fixName.value.trim();
+  const desc = fixDesc.value.trim() || name;
+  const amt = toNum(fixAmt.value);
+  if(!name || !amt) return;
+
+  const day = Math.min(28, Math.max(1, toNum(fixDay.value)));
+  const cat = fixCat.value || detectCategory(desc);
+
+  const tpl={
+    id, name,
+    description: desc,
+    amount: amt,
+    currency: fixCur.value,
+    day,
+    category: cat,
+    paymentType: fixPayType.value,
+    paymentInstrument: fixPayInst.value || "",
+    enabled: !!fixEnabled.checked
+  };
+
+  const idx=STATE.data.fixed.findIndex(x=>x.id===id);
+  if(idx>=0) STATE.data.fixed[idx]=tpl;
+  else STATE.data.fixed.unshift(tpl);
+
+  save();
+  fixBg.style.display="none";
+  render();
+});
+
+/* Generate fixed for month */
+btnGenFixed.addEventListener("click",()=>{
+  const [Y,M]=ACTIVE_MONTH.split("-").map(Number);
+  const iso=(day)=> new Date(Y, M-1, Math.min(28, Math.max(1, day))).toISOString().slice(0,10);
+  let added=0;
+
+  for(const tpl of STATE.data.fixed){
+    if(!tpl.enabled) continue;
+    const date=iso(tpl.day);
+    const exists = STATE.data.tx.some(t =>
+      t.date===date && t.type==="gasto" &&
+      (t.description||"")===(tpl.description||tpl.name||"") &&
+      Number(t.amount)===Number(tpl.amount) &&
+      t.currency===tpl.currency
+    );
+    if(exists) continue;
+
+    STATE.data.tx.unshift({
+      id:uid(),
+      date,
+      type:"gasto",
+      description: tpl.description || tpl.name,
+      category: tpl.category || "Otros",
+      amount: tpl.amount,
+      currency: tpl.currency,
+      paymentType: tpl.paymentType,
+      paymentInstrument: tpl.paymentInstrument || "",
+      notes: `Generado desde gasto fijo (${ACTIVE_MONTH})`
+    });
+    added++;
+  }
+
+  save();
+  render();
+  alert(added ? `Listo: se generaron ${added} gastos fijos para ${ACTIVE_MONTH}.` : "No se generó nada (ya existían o no hay fijos activos).");
+});
+
+/* ========= Settings modal ========= */
+const setBg=document.getElementById("setBg");
+const btnSettings=document.getElementById("btnSettings");
+const closeSet=document.getElementById("closeSet");
+const setBaseCur=document.getElementById("setBaseCur");
+const setFx=document.getElementById("setFx");
+const setCats=document.getElementById("setCats");
+const setDeb=document.getElementById("setDeb");
+const setCre=document.getElementById("setCre");
+const setRules=document.getElementById("setRules");
+const btnSetSave=document.getElementById("btnSetSave");
+const btnSetReset=document.getElementById("btnSetReset");
+
+btnSettings.addEventListener("click",()=>{
+  setBg.style.display="flex";
+  setBaseCur.value=STATE.settings.baseCurrency;
+  setFx.value=STATE.settings.fx;
+  setCats.value=STATE.settings.categories.join("; ");
+  setDeb.value=STATE.settings.cards.debito.join(", ");
+  setCre.value=STATE.settings.cards.credito.join(", ");
+  setRules.value=(STATE.settings.rules||[]).map(r=>`${r.k}=${r.c}`).join("\n");
+});
+closeSet.addEventListener("click",()=>setBg.style.display="none");
+
+btnSetReset.addEventListener("click",()=>{
+  const d=defaultState();
+  STATE.settings=d.settings;
+  save();
+  setBg.style.display="none";
+  fillCats(txCat); fillCats(fixCat);
+  fillPayInst(txPayInst, txPayType.value);
+  fillPayInst(fixPayInst, fixPayType.value);
+  render();
+});
+
+btnSetSave.addEventListener("click",()=>{
+  STATE.settings.baseCurrency=setBaseCur.value;
+  STATE.settings.fx=Math.min(2000, Math.max(1, toNum(setFx.value)));
+
+  const cats=setCats.value.split(";").map(s=>s.trim()).filter(Boolean);
+  if(cats.length) STATE.settings.categories=cats;
+
+  STATE.settings.cards.debito=setDeb.value.split(",").map(s=>s.trim()).filter(Boolean);
+  STATE.settings.cards.credito=setCre.value.split(",").map(s=>s.trim()).filter(Boolean);
+
+  const rules=setRules.value.split("\n").map(l=>l.trim()).filter(Boolean).map(line=>{
+    const [k, ...rest]=line.split("=");
+    return { k:(k||"").trim(), c:rest.join("=").trim() || "Otros" };
+  }).filter(r=>r.k);
+  STATE.settings.rules=rules;
+
+  save();
+  setBg.style.display="none";
+  subhead.textContent=`Moneda base: ${STATE.settings.baseCurrency} • Tasa: ${STATE.settings.fx} CRC/USD`;
+  fillCats(txCat); fillCats(fixCat);
+  fillPayInst(txPayInst, txPayType.value);
+  fillPayInst(fixPayInst, fixPayType.value);
+  render();
+});
+
+/* ========= Backup/Restore/CSV ========= */
+document.getElementById("btnBackup").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(STATE,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`finanzas_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+});
+
+document.getElementById("btnRestore").addEventListener("click",()=>{
+  const inp=document.createElement("input");
+  inp.type="file"; inp.accept="application/json";
+  inp.onchange=()=>{
+    const f=inp.files && inp.files[0];
+    if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const next=JSON.parse(String(r.result||""));
+        if(!next || !next.settings) throw new Error();
+        STATE=next;
+        save();
+        location.reload();
+      }catch{ alert("Archivo inválido."); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+});
+
+document.getElementById("btnReportsCsv").addEventListener("click",()=>{
+  const list=getMonthTx();
+  const headers=["date","type","description","category","amount","currency","paymentType","paymentInstrument","notes","baseAmount","baseCurrency"];
+  const rows=list.map(t=>[
+    t.date,t.type,t.description,t.category,t.amount,t.currency,t.paymentType,t.paymentInstrument,(t.notes||"").replace(/\n/g," "),
+    baseAmount(t).toFixed(2), STATE.settings.baseCurrency
+  ]);
+  const csv=[headers.join(","), ...rows.map(r=>r.map(x=>`"${String(x??"").replace(/"/g,'""')}"`).join(","))].join("\n");
+  const blob=new Blob([csv],{type:"text/csv"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`finanzas_${ACTIVE_MONTH}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+});
+
+/* ========= Render ========= */
+let chartCat=null, chartPay=null, chartTrend=null;
+
+function getMonthTx(){
+  return STATE.data.tx.filter(t => (t.date||"").slice(0,7)===ACTIVE_MONTH);
+}
+function summaryFor(list){
+  let inc=0, exp=0, inv=0;
+  for(const t of list){
+    const v=baseAmount(t);
+    if(t.type==="ingreso") inc+=v;
+    else if(t.type==="gasto") exp+=v;
+    else inv+=v;
+  }
+  return {inc,exp,inv,net:inc-exp-inv};
+}
+function renderTxList(list){
+  txList.innerHTML="";
+  txCount.textContent=`Total: ${list.length} movimientos`;
+  if(list.length===0){
+    txList.innerHTML=`<div class="muted">No hay movimientos en este mes.</div>`;
+    return;
+  }
+  for(const t of list.sort((a,b)=>a.date<b.date?1:-1)){
+    const payLabel=t.paymentType==="credito"?"Crédito":t.paymentType==="debito"?"Débito":"Efectivo";
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`
+      <div style="min-width:0;">
+        <b style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(t.description||"(Sin descripción)")}</b>
+        <div class="muted">${t.date} • <span class="pill">${escapeHtml(t.category||"Otros")}</span> <span class="pill">${payLabel}${t.paymentInstrument?(" • "+escapeHtml(t.paymentInstrument)):""}</span></div>
+        ${t.notes?`<div class="muted" style="margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(t.notes)}</div>`:""}
+      </div>
+      <div class="right">
+        <div><b>${fmt(t.amount, t.currency)}</b></div>
+        <div class="muted">${STATE.settings.baseCurrency!==t.currency ? ("≈ "+fmt(baseAmount(t), STATE.settings.baseCurrency)) : ""}</div>
+        <div style="margin-top:8px;">
+          <button class="smallbtn danger" data-del="${t.id}">Borrar</button>
+        </div>
+      </div>`;
+    txList.appendChild(div);
+  }
+  txList.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id=btn.getAttribute("data-del");
+      STATE.data.tx=STATE.data.tx.filter(x=>x.id!==id);
+      save(); render();
+    });
+  });
+}
+function renderFixedList(){
+  fixedList.innerHTML="";
+  if(STATE.data.fixed.length===0){
+    fixedList.innerHTML=`<div class="muted">Aún no has creado gastos fijos.</div>`;
+    return;
+  }
+  for(const f of STATE.data.fixed){
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`
+      <div style="min-width:0;">
+        <b style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(f.name||f.description||"(Sin nombre)")}</b>
+        <div class="muted">Día ${f.day} • <span class="pill">${escapeHtml(f.category||"Otros")}</span> <span class="pill">${f.enabled?"Activo":"Pausado"}</span></div>
+      </div>
+      <div class="right">
+        <div><b>${fmt(f.amount, f.currency)}</b></div>
+        <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
+          <button class="smallbtn" data-edit="${f.id}">Editar</button>
+          <button class="smallbtn danger" data-rm="${f.id}">Borrar</button>
+        </div>
+      </div>`;
+    fixedList.appendChild(div);
+  }
+  fixedList.querySelectorAll("[data-edit]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id=btn.getAttribute("data-edit");
+      const tpl=STATE.data.fixed.find(x=>x.id===id);
+      openFixed(tpl);
+    });
+  });
+  fixedList.querySelectorAll("[data-rm]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id=btn.getAttribute("data-rm");
+      STATE.data.fixed=STATE.data.fixed.filter(x=>x.id!==id);
+      save(); render();
+    });
+  });
+}
+function renderCharts(list){
+  const mapCat={}, mapPay={};
+  for(const t of list){
+    if(t.type!=="gasto") continue;
+    const v=baseAmount(t);
+    mapCat[t.category||"Otros"]=(mapCat[t.category||"Otros"]||0)+v;
+    mapPay[t.paymentType||"efectivo"]=(mapPay[t.paymentType||"efectivo"]||0)+v;
+  }
+  const catLabels=Object.keys(mapCat);
+  const catVals=catLabels.map(k=>mapCat[k]);
+
+  const payKeys=Object.keys(mapPay);
+  const payLabels=payKeys.map(k=>k==="credito"?"Crédito":k==="debito"?"Débito":"Efectivo");
+  const payVals=payKeys.map(k=>mapPay[k]);
+
+  if(chartCat) chartCat.destroy();
+  if(chartPay) chartPay.destroy();
+
+  chartCat=new Chart(document.getElementById("chartCat"),{
+    type:"pie",
+    data:{ labels:catLabels, datasets:[{ data:catVals }] },
+    options:{ plugins:{ legend:{ position:"bottom" } } }
+  });
+
+  chartPay=new Chart(document.getElementById("chartPay"),{
+    type:"bar",
+    data:{ labels:payLabels, datasets:[{ label:"Gastos", data:payVals }] },
+    options:{ plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  // Trend 6 months
+  const months=[];
+  const d=new Date();
+  for(let i=5;i>=0;i--){
+    const dd=new Date(d.getFullYear(), d.getMonth()-i, 1);
+    months.push(yyyymm(dd));
+  }
+  const inc=[], exp=[], inv=[], net=[];
+  for(const m of months){
+    const ls=STATE.data.tx.filter(t=>(t.date||"").slice(0,7)===m);
+    const s=summaryFor(ls);
+    inc.push(s.inc); exp.push(s.exp); inv.push(s.inv); net.push(s.net);
+  }
+  if(chartTrend) chartTrend.destroy();
+  chartTrend=new Chart(document.getElementById("chartTrend"),{
+    type:"line",
+    data:{
+      labels:months,
+      datasets:[
+        {label:"Ingresos", data:inc, tension:.3},
+        {label:"Gastos", data:exp, tension:.3},
+        {label:"Inversiones", data:inv, tension:.3},
+        {label:"Neto", data:net, tension:.3},
+      ]
+    },
+    options:{ plugins:{ legend:{ position:"bottom" } }, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+function render(){
+  subhead.textContent=`Moneda base: ${STATE.settings.baseCurrency} • Tasa: ${STATE.settings.fx} CRC/USD`;
+
+  const list=getMonthTx();
+  const s=summaryFor(list);
+
+  kpiIncome.textContent=fmt(s.inc, STATE.settings.baseCurrency);
+  kpiExpense.textContent=fmt(s.exp, STATE.settings.baseCurrency);
+  kpiInvest.textContent=fmt(s.inv, STATE.settings.baseCurrency);
+  kpiNet.textContent=fmt(s.net, STATE.settings.baseCurrency);
+
+  renderTxList(list);
+  renderFixedList();
+
+  const repVisible = !document.getElementById("tabRep").classList.contains("hidden");
+  if(repVisible) renderCharts(list);
+}
+render();
+
+/* Si hay PIN, bloquear al inicio */
+if(STATE.auth.pinHash) openLock();
+</script>
+
+</body>
+</html>
